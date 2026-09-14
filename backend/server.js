@@ -49,9 +49,7 @@ app.post('/api/verification-request', (req, res) => {
 
       db.run(
         `INSERT INTO verification_requests (candidate_number, full_name, email, pin)
-         VALUES (?, ?, ?, ?)
-         ON CONFLICT(candidate_number)
-         DO UPDATE SET full_name = excluded.full_name, email = excluded.email, pin = excluded.pin, created_at = CURRENT_TIMESTAMP`,
+         VALUES (?, ?, ?, ?)`,
         [normalizedCandidate, normalizedFullName, normalizedEmail, normalizedPin],
         function (runErr) {
           if (runErr) {

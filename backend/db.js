@@ -42,13 +42,15 @@ const initDatabase = () => {
     db.run(`
       CREATE TABLE IF NOT EXISTS verification_requests (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        candidate_number TEXT UNIQUE NOT NULL,
+        candidate_number TEXT NOT NULL,
         full_name TEXT NOT NULL,
         email TEXT NOT NULL,
         pin TEXT NOT NULL,
         created_at TEXT DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    migrateVerificationRequestsTable();
 
     db.all('PRAGMA table_info(certificates)', (err, columns) => {
       if (err) {
@@ -68,6 +70,43 @@ const initDatabase = () => {
     });
   });
 };
+
+function migrateVerificationRequestsTable() {
+  db.get(
+    "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'verification_requests'",
+    (err, row) => {
+      if (err || !row || !row.sql) {
+        return;
+      }
+
+      const tableSql = String(row.sql || '');
+
+      if (!tableSql.includes('UNIQUE')) {
+        return;
+      }
+
+      db.serialize(() => {
+        db.run('ALTER TABLE verification_requests RENAME TO verification_requests_old');
+        db.run(`
+          CREATE TABLE verification_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_number TEXT NOT NULL,
+            full_name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            pin TEXT NOT NULL,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+          )
+        `);
+        db.run(`
+          INSERT INTO verification_requests (candidate_number, full_name, email, pin, created_at)
+          SELECT candidate_number, full_name, email, pin, created_at
+          FROM verification_requests_old
+        `);
+        db.run('DROP TABLE verification_requests_old');
+      });
+    }
+  );
+}
 
 function insertSeedData() {
   db.run(

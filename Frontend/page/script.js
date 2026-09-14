@@ -74,14 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const requests = getStoredVerificationRequests();
-    const updated = requests.filter((request) => normalizeCandidateNumber(request.candidateNumber) !== normalizedCandidate);
-    updated.unshift({
+    requests.push({
       fullName: safeFullName,
       candidateNumber: normalizedCandidate,
       email: safeEmail,
       pin: normalizedPin
     });
-    saveVerificationRequests(updated);
+    saveVerificationRequests(requests);
   };
 
   const normalizeCandidateNumber = (value) => String(value || '').trim().replace(/\s+/g, '').toUpperCase();
