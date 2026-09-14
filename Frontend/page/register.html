@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WAEC Verification PIN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="auth-body" data-page="register">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-mark"><div class="brand-ring"></div><div class="brand-core"><span>W</span></div></div>
+        <div>
+          <h1>WAEC</h1>
+          <p>West African Examinations Council</p>
+        </div>
+      </div>
+
+      <h2>Generate Verification PIN</h2>
+      <form class="auth-form" id="registerForm" novalidate action="javascript:void(0);" method="post">
+        <label>
+          <span>Student's Full Name</span>
+          <input type="text" name="fullName" placeholder="Enter student's full name" required />
+        </label>
+        <label>
+          <span>Candidate Number</span>
+          <input type="text" name="candidateNumber" placeholder="Enter candidate number" required />
+        </label>
+        <label>
+          <span>Student's Email</span>
+          <input type="email" name="email" placeholder="Enter student's email address" required />
+        </label>
+        <label>
+          <span>Create Verification PIN</span>
+          <input type="text" name="pin" id="verificationPinInput" placeholder="PIN will be generated here" readonly required />
+        </label>
+        <p class="auth-message" id="registerMessage" aria-live="polite"></p>
+        <button id="generatePinButton" class="primary-button auth-button" type="button" formnovalidate>Generate PIN</button>
+      </form>
+
+      <div class="auth-footer" style="margin-top: 20px; text-align: center;">
+        <p>Already have a verification PIN? <a href="login.html" style="color: #1d4ed8; font-weight: 600; text-decoration: none;">Sign in</a></p>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

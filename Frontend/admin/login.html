@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Login | WAEC Verification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../page/styles.css" />
+  </head>
+  <body data-page="admin-login" class="auth-body">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-mark"><div class="brand-ring"></div><div class="brand-core"><span>W</span></div></div>
+        <div>
+          <h1>WAEC</h1>
+          <p>Admin Access Portal</p>
+        </div>
+      </div>
+
+      <h2>Admin Sign In</h2>
+      <form id="adminLoginForm" class="auth-form">
+        <label>
+          Admin ID
+          <input type="text" id="adminId" name="adminId" placeholder="Enter admin ID" required />
+        </label>
+
+        <label>
+          Password
+          <input type="password" id="adminPassword" name="adminPassword" placeholder="Enter password" required />
+        </label>
+
+        <p id="authMessage" class="auth-message" aria-live="polite"></p>
+
+        <button type="submit" class="primary-button auth-button">Sign In</button>
+      </form>
+
+      <div style="margin-top: 18px; padding: 12px 14px; background: rgba(30, 64, 175, 0.08); border: 1px solid rgba(30, 64, 175, 0.18); border-radius: 10px; font-size: 0.9rem; color: var(--gray-600);">
+        <!-- <strong>Default admin:</strong><br />
+        Admin ID: <strong>admin</strong><br />
+        Password: <strong>admin123</strong> -->
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

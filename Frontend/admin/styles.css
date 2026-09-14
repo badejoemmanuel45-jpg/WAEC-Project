@@ -1,0 +1,13 @@
+@import url('../page/styles.css');
+
+body {
+  background: linear-gradient(180deg, #edf3fb 0%, #f7f9fd 100%);
+}
+
+.auth-body {
+  min-height: 100vh;
+}
+
+.muted-link a:hover {
+  text-decoration: underline;
+}
