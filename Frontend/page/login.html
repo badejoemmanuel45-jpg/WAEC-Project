@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WAEC Portal Login</title>
+    <title>WAEC Verifier Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -19,10 +19,10 @@
         </div>
       </div>
 
-      <h2>Access your dashboard</h2>
+      <h2>Verifier Login</h2>
       <form class="auth-form" action="" method="" id="loginForm" novalidate>
         <label>
-          <span>Candidate Number</span>
+          <span>Candidate Number to Verify</span>
           <input type="text" id="candidateNumber" placeholder="Enter candidate number" autocomplete="username" required />
         </label>
         <label>
@@ -30,7 +30,7 @@
           <input type="password" id="password" placeholder="Enter the verification PIN" autocomplete="current-password" required />
         </label>
         <p class="auth-message" id="authMessage" aria-live="polite"></p>
-        <button class="primary-button auth-button" type="submit">Access Dashboard</button>
+        <button class="primary-button auth-button" type="submit">Access Verifier Portal</button>
       </form>
 
       <div class="auth-footer" style="margin-top: 20px; text-align: center;">

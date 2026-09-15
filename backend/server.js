@@ -400,15 +400,9 @@ app.post('/api/admin/delete-record', (req, res) => {
         return res.status(500).json({ success: false, message: 'Failed to delete certificate record.' });
       }
 
-      db.run('DELETE FROM candidates WHERE candidate_number = ? AND candidate_number NOT IN (SELECT candidate_number FROM certificates)', [normalizedCandidate], (err3) => {
-        if (err3) {
-          return res.status(500).json({ success: false, message: 'Failed to clean candidate record.' });
-        }
-
-        return res.json({
-          success: true,
-          message: 'Record deleted successfully.'
-        });
+      return res.json({
+        success: true,
+        message: 'Record deleted successfully.'
       });
     });
   });
@@ -446,23 +440,10 @@ app.post('/api/admin/results', (req, res) => {
   );
 
   db.run(
-    `UPDATE candidates SET full_name = ?, email = ?, password = ? WHERE candidate_number = ?`,
-    [fullName.trim(), safeEmail, defaultPassword, normalizedCandidate]
-  );
-
-  db.run(
     `INSERT OR IGNORE INTO certificates (candidate_number, certificate_number, exam_type, exam_year, status, verification_hash)
      VALUES (?, ?, ?, ?, 'issued', ?)`,
     [normalizedCandidate, normalizedCertificate, examType, normalizedYear, generatedHash]
   );
-
-  db.run(
-    `UPDATE certificates SET exam_type = ?, exam_year = ?, status = 'issued', verification_hash = ?
-     WHERE certificate_number = ?`,
-    [examType, normalizedYear, generatedHash, normalizedCertificate]
-  );
-
-  db.run('DELETE FROM results WHERE candidate_number = ? AND exam_year = ?', [normalizedCandidate, normalizedYear]);
 
   const resultStmt = db.prepare(
     `INSERT INTO results (candidate_number, subject, grade, exam_year) VALUES (?, ?, ?, ?)`

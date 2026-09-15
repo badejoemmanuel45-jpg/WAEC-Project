@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>WAEC Certification Portal</title>
+    <title>WAEC Verifier Portal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -25,7 +25,6 @@
 
         <nav class="side-nav" aria-label="Sidebar navigation">
           <button class="nav-item" type="button" data-page="dashboard" data-link="dashboard.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5V20a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1v-8.5Z"/></svg><span>Dashboard</span></button>
-          <button class="nav-item" type="button" data-page="results" data-link="results.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18V8.5A2.5 2.5 0 0 1 7.5 6H16a2 2 0 0 1 2 2v10M5 18h14M9 10h6M9 14h6"/></svg><span>My Results</span></button>
           <button class="nav-item" type="button" data-page="verify" data-link="verify-certificate.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5V7.8A2.8 2.8 0 0 1 9.8 5h4.4A2.8 2.8 0 0 1 17 7.8v4.7a2.8 2.8 0 0 1-2.8 2.8H12l-3 3v-3.2A2.8 2.8 0 0 1 7 12.5Zm2.5-3.5h5M9.5 10h5"/></svg><span>Verify Certificate</span></button>
           <button class="nav-item" type="button" data-page="profile" data-link="profile.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12.2a3.4 3.4 0 1 0-3.4-3.4 3.4 3.4 0 0 0 3.4 3.4Zm-6.4 7.3a6.4 6.4 0 0 1 12.8 0"/></svg><span>Profile</span></button>
           <button class="nav-item" type="button" data-page="support" data-link="support.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.8a7.2 7.2 0 0 1 7.2 7.2v3.5l1.7 3.1H3.1l1.7-3.1V12A7.2 7.2 0 0 1 12 4.8Zm0 15.4a2.1 2.1 0 0 1-2.1-2.1h4.2A2.1 2.1 0 0 1 12 20.2Z"/></svg><span>Help &amp; Support</span></button>
@@ -37,11 +36,6 @@
 
       <main class="main-panel">
         <header class="topbar">
-          <label class="search-wrap" aria-label="Search">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M16 16l5 5"></path></svg>
-            <input type="text" placeholder="Search for results, certificates, or reference number..." />
-          </label>
-
           <div class="top-actions">
             <button class="notify-button" aria-label="Notifications">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0"/></svg>
@@ -61,8 +55,8 @@
         <section class="content">
           <div class="page-heading">
             <div>
-              <h2>WAEC Certification</h2>
-              <p>Access, download and verify your West African Examinations Council certificate securely and easily.</p>
+              <h2>WAEC Verifier Portal</h2>
+              <p>Verify West African Examinations Council certificates securely and easily.</p>
             </div>
           </div>
 
@@ -70,13 +64,13 @@
             <div class="primary-column">
               <article class="certificate-card">
                 <div class="status-pill">✓ Portal Ready</div>
-                <h3>WAEC Verification Portal</h3>
-                <p>Use the verification tools to check certificate authenticity and review result records securely.</p>
+                <h3>Certificate Verification</h3>
+                <p>Use the verification tools to check certificate authenticity securely.</p>
 
                 <div class="info-grid">
                   <div class="info-row full-row">
                     <span class="label">Status</span>
-                    <span class="value">Access granted for verified certificate checks</span>
+                    <span class="value">Verifier access granted for certificate checks</span>
                   </div>
                 </div>
               </article>
@@ -89,36 +83,36 @@
                 <h3>Certificate Status</h3>
               </div>
 
-              <div class="timeline" aria-label="Certificate application status">
-                <div class="timeline-item completed">
+              <div class="timeline" id="certificateTimeline" aria-label="Certificate application status">
+                <div class="timeline-item completed" data-stage="application">
                   <div class="bubble">✓</div>
                   <div class="stage-copy">
                     <h4>Application Received</h4>
-                    <span>12 Mar 2024</span>
+                    <span data-stage-date>Record available</span>
                   </div>
                   <div class="status-tag">Completed</div>
                 </div>
-                <div class="timeline-item completed">
+                <div class="timeline-item completed" data-stage="verification">
                   <div class="bubble">✓</div>
                   <div class="stage-copy">
                     <h4>Verification Completed</h4>
-                    <span>14 Mar 2024</span>
+                    <span data-stage-date>Record available</span>
                   </div>
                   <div class="status-tag">Completed</div>
                 </div>
-                <div class="timeline-item completed">
+                <div class="timeline-item completed" data-stage="issued">
                   <div class="bubble">✓</div>
                   <div class="stage-copy">
                     <h4>Certificate Issued</h4>
-                    <span>16 Mar 2024</span>
+                    <span data-stage-date>Exam year pending</span>
                   </div>
                   <div class="status-tag">Completed</div>
                 </div>
-                <div class="timeline-item pending">
+                <div class="timeline-item pending" data-stage="delivered">
                   <div class="bubble pending-bubble">○</div>
                   <div class="stage-copy">
                     <h4>Delivered</h4>
-                    <span>—</span>
+                    <span data-stage-date>Date not recorded</span>
                   </div>
                   <div class="status-tag pending-tag">Pending</div>
                 </div>
@@ -140,14 +134,6 @@
                   <svg class="action-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
                 </button>
 
-                <button class="action-item" type="button" data-link="results.html">
-                  <div class="action-icon history"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3.5h8l4 4V18a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2Zm8 1.5v4h4M8 11h8M8 15h6"/></svg></div>
-                  <div class="action-copy">
-                    <strong>View Past Certificates</strong>
-                    <span>Access previously issued certificates</span>
-                  </div>
-                  <svg class="action-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-                </button>
               </div>
             </aside>
           </div>

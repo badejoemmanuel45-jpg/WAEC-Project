@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (certificateNumberValue) certificateNumberValue.textContent = candidate.certificateNumber || 'WAEC/2024/00067891';
 
     if (document.getElementById('profileCandidateId')) {
-      document.getElementById('profileCandidateId').textContent = `Candidate ID: ${candidate.candidateNumber}`;
+      document.getElementById('profileCandidateId').textContent = `Record under verification: ${candidate.candidateNumber}`;
     }
 
     if (document.getElementById('profileEmail')) {
@@ -279,12 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const rememberedUser = getRememberedUsers()[0] || null;
 
   if (pageName && protectedPages.has(pageName) && !currentCandidate) {
-    if (rememberedUser) {
-      localStorage.setItem(ACTIVE_USER_KEY, JSON.stringify(rememberedUser));
-      window.location.href = 'dashboard.html';
-      return;
-    }
-
+    clearSignedInSession();
     sessionStorage.setItem('waecAuthError', 'Please sign in first to access this page.');
     window.location.href = 'login.html';
     return;
@@ -293,16 +288,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (pageName === 'login') {
     const loginError = sessionStorage.getItem('waecAuthError');
     const authMessage = document.getElementById('authMessage');
+
     if (loginError && authMessage) {
       authMessage.textContent = loginError;
       authMessage.classList.remove('success');
       authMessage.classList.add('error');
       sessionStorage.removeItem('waecAuthError');
-    }
-
-    if (currentCandidate) {
-      window.location.href = 'dashboard.html';
-      return;
     }
   }
 
@@ -358,6 +349,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       })
       .catch(() => {});
+
+    const certificateTimeline = document.getElementById('certificateTimeline');
+    if (certificateTimeline) {
+      const timelineStages = [...certificateTimeline.querySelectorAll('[data-stage]')];
+      const setTimelineStage = (stage, state, label) => {
+        const item = timelineStages.find((entry) => entry.dataset.stage === stage);
+        if (!item) return;
+
+        item.classList.remove('completed', 'pending', 'rejected');
+        item.classList.add(state);
+        const statusTag = item.querySelector('.status-tag');
+        const bubble = item.querySelector('.bubble');
+        if (statusTag) statusTag.textContent = label;
+        if (bubble) bubble.textContent = state === 'completed' ? '✓' : state === 'rejected' ? '!' : '○';
+      };
+
+      const setTimelineDate = (stage, value) => {
+        const item = timelineStages.find((entry) => entry.dataset.stage === stage);
+        const date = item?.querySelector('[data-stage-date]');
+        if (date) date.textContent = value;
+      };
+
+      apiFetch(`/api/certificates/${currentCandidateNumber}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const certificate = data && data.success && Array.isArray(data.certificates)
+            ? data.certificates[0]
+            : null;
+          const certificateStatus = String(certificate?.status || '').toLowerCase();
+
+          if (!certificate) {
+            setTimelineDate('application', 'Date not recorded');
+            setTimelineDate('verification', 'Date not recorded');
+            setTimelineDate('issued', 'Exam year pending');
+            setTimelineDate('delivered', 'Date not recorded');
+            setTimelineStage('application', 'completed', 'Registered');
+            setTimelineStage('verification', 'pending', 'Pending');
+            setTimelineStage('issued', 'pending', 'Pending');
+            setTimelineStage('delivered', 'pending', 'Pending');
+            return;
+          }
+
+          if (certificateStatus === 'issued') {
+            const examYear = certificate.exam_year ? `Exam year ${certificate.exam_year}` : 'Exam year not recorded';
+            setTimelineDate('application', examYear);
+            setTimelineDate('verification', examYear);
+            setTimelineDate('issued', examYear);
+            setTimelineDate('delivered', 'Date not recorded');
+            setTimelineStage('application', 'completed', 'Completed');
+            setTimelineStage('verification', 'completed', 'Completed');
+            setTimelineStage('issued', 'completed', 'Issued');
+            setTimelineStage('delivered', 'pending', 'Pending');
+            return;
+          }
+
+          const examYear = certificate.exam_year ? `Exam year ${certificate.exam_year}` : 'Exam year not recorded';
+          setTimelineDate('application', examYear);
+          setTimelineDate('verification', examYear);
+          setTimelineDate('issued', 'Not issued');
+          setTimelineDate('delivered', 'Date not recorded');
+          setTimelineStage('application', 'completed', 'Completed');
+          setTimelineStage('verification', certificateStatus === 'revoked' ? 'rejected' : 'pending', certificateStatus === 'revoked' ? 'Revoked' : 'Pending');
+          setTimelineStage('issued', 'pending', 'Pending');
+          setTimelineStage('delivered', 'pending', 'Pending');
+        })
+        .catch(() => {});
+    }
   }
 
   if (pageName === 'results') {
@@ -551,6 +609,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelectorAll('[data-link]').forEach((element) => {
     if (element.classList.contains('nav-item')) return;
+    if (element.tagName === 'BUTTON' && (element.type === 'submit' || element.type === 'button')) {
+      return;
+    }
     element.addEventListener('click', () => {
       const target = element.dataset.link;
       if (target) window.location.href = target;
@@ -670,28 +731,70 @@ document.addEventListener('DOMContentLoaded', () => {
   const verifyCertificateNumber = document.getElementById('verifyCertificateNumber');
   const verifyExamYear = document.getElementById('verifyExamYear');
   const verificationResult = document.getElementById('verificationResult');
-  const verifyResultRows = document.getElementById('verifyResultRows');
-  const addVerifyResultRowButton = document.getElementById('addVerifyResultRow');
-
-  if (verifyResultRows && addVerifyResultRowButton) {
-    const addVerifyResultRow = () => {
-      const row = document.createElement('div');
-      row.className = 'result-row';
-      row.innerHTML = `
-        <input type="text" name="verifySubject" placeholder="Subject" required />
-        <input type="text" name="verifyGrade" placeholder="Grade" required />
-        <button type="button" class="remove-row">Remove</button>
-      `;
-      row.querySelector('.remove-row').addEventListener('click', () => row.remove());
-      verifyResultRows.appendChild(row);
-    };
-
-    addVerifyResultRow();
-    addVerifyResultRowButton.addEventListener('click', addVerifyResultRow);
-  }
 
   if (verificationForm && verifyCandidateNumber && verifyCertificateNumber && verifyExamYear && verificationResult) {
     const resultMessage = verificationResult.querySelector('.result-message');
+
+    const renderAuthResultCard = (data) => {
+      const candidate = data?.candidate || {};
+      const certificate = data?.certificate || {};
+      const rows = Array.isArray(data?.results) && data.results.length > 0
+        ? data.results
+        : [];
+
+      const subjectRows = rows.length > 0
+        ? rows.map((item) => `
+            <div class="verification-subject-row">
+              <span>${String(item?.subject || 'N/A')}</span>
+              <strong>${String(item?.grade || 'N/A')}</strong>
+            </div>
+          `).join('')
+        : '<div class="verification-empty">No subject result data available.</div>';
+
+      verificationResult.innerHTML = `
+        <div class="verification-certificate-card">
+          <div class="verification-header">
+            <div class="verification-badge">Verified</div>
+            <p class="verification-note">${data?.message || 'Certificate verified successfully.'}</p>
+          </div>
+
+          <div class="verification-summary-grid">
+            <div class="verification-summary-block">
+              <span>Candidate Name</span>
+              <strong>${candidate.fullName || 'N/A'}</strong>
+            </div>
+            <div class="verification-summary-block">
+              <span>Examination</span>
+              <strong>${certificate.examType || 'WASSCE'}</strong>
+            </div>
+            <div class="verification-summary-block">
+              <span>Candidate Number</span>
+              <strong>${candidate.candidateNumber || 'N/A'}</strong>
+            </div>
+            <div class="verification-summary-block">
+              <span>Year</span>
+              <strong>${certificate.examYear || 'N/A'}</strong>
+            </div>
+            <div class="verification-summary-block">
+              <span>Certificate Number</span>
+              <strong>${certificate.certificateNumber || 'N/A'}</strong>
+            </div>
+            <div class="verification-summary-block">
+              <span>Verification Hash</span>
+              <strong>${certificate.hash || 'N/A'}</strong>
+            </div>
+          </div>
+
+          <div class="verification-subjects">
+            <div class="verification-subjects-header">
+              <span>Subject</span>
+              <span>Grade</span>
+            </div>
+            ${subjectRows}
+          </div>
+        </div>
+      `;
+    };
 
     verificationForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -699,31 +802,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const candidateNumber = verifyCandidateNumber.value.trim();
       const certificateNumber = verifyCertificateNumber.value.trim();
       const examYear = verifyExamYear.value.trim();
-      const rows = Array.from((verifyResultRows || document.querySelectorAll('#verifyResultRows .result-row')));
-      const results = rows
-        .map((row) => {
-          const subjectInput = row.querySelector('input[name="verifySubject"]');
-          const gradeInput = row.querySelector('input[name="verifyGrade"]');
-          const subject = subjectInput ? subjectInput.value.trim() : '';
-          const grade = gradeInput ? gradeInput.value.trim().toUpperCase() : '';
-          return { subject, grade };
-        })
-        .filter((entry) => entry.subject && entry.grade);
+      const results = [];
 
       if (!candidateNumber || !certificateNumber || !examYear) {
-        if (resultMessage) {
-          resultMessage.textContent = 'Please complete all verification fields.';
-          resultMessage.classList.remove('success-text');
-          resultMessage.classList.remove('warning-text');
-          resultMessage.classList.add('error-text');
-        }
+        verificationResult.innerHTML = '<strong>Authentication Result</strong><p class="result-message error-text">Please complete all verification fields.</p>';
         return;
       }
 
-      if (resultMessage) {
-        resultMessage.textContent = 'Checking certificate authenticity and result details...';
-        resultMessage.classList.remove('success-text', 'warning-text', 'error-text');
-      }
+      verificationResult.innerHTML = '<strong>Authentication Result</strong><p class="result-message">Checking certificate authenticity and result details...</p>';
 
       try {
         const response = await apiFetch('/api/verify-certificate', {
@@ -737,26 +823,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!response.ok || !data.success) {
           const status = data.status || 'fake';
           const message = data.message || 'Verification failed.';
-          if (resultMessage) {
-            resultMessage.textContent = message;
-            resultMessage.classList.remove('success-text', 'warning-text');
-            resultMessage.classList.toggle('error-text', status !== 'tampered');
-            resultMessage.classList.toggle('warning-text', status === 'tampered');
-          }
+          verificationResult.innerHTML = `
+            <strong>Authentication Result</strong>
+            <p class="${status === 'tampered' ? 'warning-text' : 'error-text'}">${message}</p>
+          `;
           return;
         }
 
-        if (resultMessage) {
-          resultMessage.textContent = data.message || 'Certificate verification completed successfully.';
-          resultMessage.classList.remove('warning-text', 'error-text');
-          resultMessage.classList.add('success-text');
-        }
+        renderAuthResultCard(data);
       } catch (error) {
-        if (resultMessage) {
-          resultMessage.textContent = 'Unable to connect to the verification server.';
-          resultMessage.classList.remove('success-text', 'warning-text');
-          resultMessage.classList.add('error-text');
-        }
+        verificationResult.innerHTML = '<strong>Authentication Result</strong><p class="error-text">Unable to connect to the verification server.</p>';
       }
     });
   }
